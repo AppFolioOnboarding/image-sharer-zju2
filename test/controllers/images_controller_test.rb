@@ -11,7 +11,45 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
+  def test_index
+    get images_path
+
+    assert_response :ok
+    assert_select 'h1', 'All Images'
+    assert_select 'ul'
+
+    assert_select 'a', 'Upload Image'
+  end
+
+  def test_index_image_order
+    url1 = 'https://i.imgur.com/eMroIPL.jpg'
+    url2 = 'https://i.imgur.com/yKAX9Fm.jpg'
+    url3 = 'https://i.imgur.com/IvVjToQ.jpg'
+    Image.create!(link: url1)
+    Image.create!(link: url2)
+    Image.create!(link: url3)
+
+    get images_path
+    assert_response :ok
+
+    assert_select 'ul'
+    assert_select 'li'
+
+    assert_select 'li:nth-child(1)' do
+      assert_select format('img[src="%<url>s"]', url: url3)
+    end
+
+    assert_select 'li:nth-child(2)' do
+      assert_select format('img[src="%<url>s"]', url: url2)
+    end
+
+    assert_select 'li:nth-child(3)' do
+      assert_select format('img[src="%<url>s"]', url: url1)
+    end
+  end
+
   def test_show
+    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
     get image_path(@image.id)
 
     assert_response :ok
