@@ -9,6 +9,16 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     get new_image_path
 
     assert_response :ok
+    assert_select 'h1', 'Save new Image Here!'
+    assert_select '.simple_form'
+
+    assert_select '#new_image', 1
+    assert_select '#new_image' do
+      assert_select '.image_link'
+      assert_select '.image_tag_list'
+    end
+
+    assert_select 'a', 'Go Back to homepage'
   end
 
   def test_index

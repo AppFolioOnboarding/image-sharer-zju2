@@ -1,7 +1,12 @@
 <h1>Save new Image Here!</h1>
+
 <%= simple_form_for @image do |form| %>
     <p>
-      <%= form.input :link%>
+      <%= form.input :link, label: 'URL:'%>
+    </p>
+
+    <p>
+      <%= form.input :tag_list, label: 'Tags', hint: '(Comma to separate tags)'%>
     </p>
 
     <p>
