@@ -31,6 +31,34 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a', 'Upload Image'
   end
 
+  def test_index_has_tags
+    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    get images_path
+
+    assert_response :ok
+    assert_select 'h1', 'All Images'
+    assert_select 'ul'
+
+    assert_select 'li.this_tag:nth-child(1)', 'fall'
+    assert_select 'li.this_tag:nth-child(2)', 'kid'
+
+    assert_select 'a', 'Upload Image'
+  end
+
+  def test_index_no_tag
+    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
+    get images_path
+
+    assert_response :ok
+    assert_select 'h1', 'All Images'
+    assert_select 'ul'
+
+    assert_select '.no_tag_here'
+    assert_select 'strong', '(No tags for this image)'
+
+    assert_select 'a', 'Upload Image'
+  end
+
   def test_index_image_order
     url1 = 'https://i.imgur.com/eMroIPL.jpg'
     url2 = 'https://i.imgur.com/yKAX9Fm.jpg'
@@ -94,7 +122,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to image_path(Image.last)
     assert_equal 'Image was successfully created', flash[:notice]
-    assert_equal [], Image.last.tag_list
+    assert_empty Image.last.tag_list
   end
 
   def test_create_with_tag__succeed

@@ -4,6 +4,16 @@
   <% @images.reverse.each do |image| %>
       <li>
         <img src="<%= image.link %>" width="400">
+
+        <% if image.tag_list.empty? %>
+            <br><strong class="no_tag_here"> (No tags for this image) </strong>
+        <% else %>
+            <ul>
+              <% image.tag_list.each do |tag| %>
+                  <li class="this_tag"> <%= tag %> </li>
+              <% end %>
+            </ul>
+        <% end %>
       </li>
   <% end %>
 </ul>
