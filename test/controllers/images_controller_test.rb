@@ -75,6 +75,18 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to image_path(Image.last)
     assert_equal 'Image was successfully created', flash[:notice]
+    assert_equal [], Image.last.tag_list
+  end
+
+  def test_create_with_tag__succeed
+    assert_difference('Image.count', 1) do
+      image_params = { link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid' }
+      post images_path, params: { image: image_params }
+    end
+
+    assert_redirected_to image_path(Image.last)
+    assert_equal 'Image was successfully created', flash[:notice]
+    assert_equal %w[fall kid], Image.last.tag_list
   end
 
   def test_create__fail
