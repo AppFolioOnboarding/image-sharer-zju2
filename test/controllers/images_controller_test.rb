@@ -58,13 +58,32 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_show
+  def test_show_no_tag
     @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
     get image_path(@image.id)
 
     assert_response :ok
     assert_select '#Header', 'This is the show page'
     assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
+    assert_select '#no_tag_here'
+
+    assert_select 'a', 'Homepage'
+  end
+
+  def test_show_has_tags
+    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    get image_path(@image.id)
+
+    assert_response :ok
+    assert_select '#Header', 'This is the show page'
+    assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
+
+    assert_select '#no_tag_here', false
+    assert_select 'li', 2
+    assert_select 'li.this_tag', 'fall'
+    assert_select 'li.this_tag', 'kid'
+
+    assert_select 'a', 'Homepage'
   end
 
   def test_create__succeed

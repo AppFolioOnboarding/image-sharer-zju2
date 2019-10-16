@@ -1,7 +1,17 @@
 <h1 id="Header">This is the show page</h1>
 <p>
-  <img src="<%= @image.link %>" >
+  <img src="<%= @image.link %>" width="400">
 </p>
+
+<% if @image.tag_list.empty? %>
+    <br><strong id="no_tag_here"> (No tags for this image) </strong>
+<% else %>
+    <ul>
+      <% @image.tag_list.each do |tag| %>
+          <li class="this_tag"> <%= tag %> </li>
+      <% end %>
+    </ul>
+<% end %>
 
 <p>
   <%= link_to 'Homepage', root_path %>
