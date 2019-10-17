@@ -1,0 +1,13 @@
+<h1>All Images</h1>
+
+<ul>
+  <% @images.reverse.each do |image| %>
+      <li>
+        <img src="<%= image.link %>" width="400">
+      </li>
+  <% end %>
+</ul>
+
+<p>
+  <%= link_to 'Upload Image', new_image_path %>
+</p>
