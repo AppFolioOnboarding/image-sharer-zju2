@@ -1,7 +1,12 @@
-<h1>All Images</h1>
+<% if @tag.present? %>
+    <h1><%= "Image with tag: #{@tag}" %></h1>
+    <%= link_to 'Show all images', images_path %>
+<% else %>
+    <h1>All Images</h1>
+<% end %>
 
 <ul>
-  <% @images.reverse.each do |image| %>
+  <% @images.each do |image| %>
       <li>
         <img src="<%= image.link %>" width="400">
 
@@ -9,8 +14,10 @@
             <br><strong class="no_tag_here"> (No tags for this image) </strong>
         <% else %>
             <ul>
-              <% image.tag_list.each do |tag| %>
-                  <li class="this_tag"> <%= tag %> </li>
+              <% image.tag_list.each do |t| %>
+                  <li class="this_tag">
+                    <%= link_to t, images_path(tag: t) %>
+                  </li>
               <% end %>
             </ul>
         <% end %>
