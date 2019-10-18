@@ -14,7 +14,9 @@ class ImagesController < ApplicationController
   end
 
   def show
-    @image = Image.find(params[:id])
+    @image = Image.find_by(id: image_param)
+
+    redirect_to images_path unless @image.present?
   end
 
   def index
@@ -24,5 +26,18 @@ class ImagesController < ApplicationController
               else
                 Image.all.order(created_at: :desc)
               end
+  end
+
+  def destroy
+    @image = Image.find_by(id: image_param)
+    @image.destroy
+
+    redirect_to images_path
+  end
+
+  private
+
+  def image_param
+    params.require(:id)
   end
 end

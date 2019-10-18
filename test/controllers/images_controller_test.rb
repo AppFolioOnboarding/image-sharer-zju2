@@ -161,4 +161,36 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select '.error', 'is an invalid URL'
   end
+
+  def test_destroy
+    url1 = 'https://i.imgur.com/0NC5cyn.jpg'
+    url2 = 'https://i.imgur.com/8GaYYya.jpg'
+    url3 = 'https://i.imgur.com/TKvSSXh.jpg'
+    Image.create!(link: url1, tag_list: 'fall, dog')
+    @image = Image.create!(link: url2, tag_list: 'fall, kid')
+    Image.create!(link: url3, tag_list: 'fall, pumpkin')
+
+    get images_path
+    assert_response :ok
+
+    assert_select 'img' do |pic|
+      assert_equal url3, pic[0][:src]
+      assert_equal url2, pic[1][:src]
+      assert_equal url1, pic[2][:src]
+    end
+
+    delete image_path(@image.id)
+
+    assert_response :found
+    assert_redirected_to images_path
+
+    get images_path
+    assert_response :ok
+
+    assert_select 'img'
+    assert_select 'img' do |pic|
+      assert_equal url3, pic[0][:src]
+      assert_equal url1, pic[1][:src]
+    end
+  end
 end
