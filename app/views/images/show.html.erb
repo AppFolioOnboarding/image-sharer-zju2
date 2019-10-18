@@ -7,8 +7,10 @@
     <br><strong id="no_tag_here"> (No tags for this image) </strong>
 <% else %>
     <ul>
-      <% @image.tag_list.each do |tag| %>
-          <li class="this_tag"> <%= tag %> </li>
+      <% @image.tag_list.each do |t| %>
+          <li>
+            <%= link_to t, images_path(tag: t) %>
+          </li>
       <% end %>
     </ul>
 <% end %>

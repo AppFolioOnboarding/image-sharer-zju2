@@ -1,10 +1,6 @@
 require 'test_helper'
 
 class ImagesControllerTest < ActionDispatch::IntegrationTest
-  setup do
-    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
-  end
-
   def test_new
     get new_image_path
 
@@ -31,22 +27,25 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a', 'Upload Image'
   end
 
-  def test_index_has_tags
-    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+  def test_index__has_tags__not_filtering_by_tag
+    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
     get images_path
 
     assert_response :ok
     assert_select 'h1', 'All Images'
+    assert_select 'a', text: 'Show all images', count: 0
     assert_select 'ul'
 
     assert_select 'li.this_tag:nth-child(1)', 'fall'
     assert_select 'li.this_tag:nth-child(2)', 'kid'
+    assert_select 'li.this_tag:nth-child(1) a[href=?]', '/images?tag=fall', text: 'fall'
+    assert_select 'li.this_tag:nth-child(2) a[href=?]', '/images?tag=kid', text: 'kid'
 
     assert_select 'a', 'Upload Image'
   end
 
-  def test_index_no_tag
-    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
+  def test_index__no_tag
+    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
     get images_path
 
     assert_response :ok
@@ -57,6 +56,23 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'strong', '(No tags for this image)'
 
     assert_select 'a', 'Upload Image'
+  end
+
+  def test_index__with_tag_filter
+    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    Image.create!(link: 'https://i.imgur.com/8GaYYsadf.jpg', tag_list: 'kid')
+    get images_path(tag: 'fall')
+
+    assert_response :ok
+    assert_select 'h1', 'Image with tag: fall'
+    assert_select 'a[href=?]', images_path, text: 'Show all images'
+    assert_select 'h1', text: 'All Images', count: 0
+    assert_select 'img', count: 1
+    assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
+
+    assert_select 'li' do
+      assert_select 'li', 'fall'
+    end
   end
 
   def test_index_image_order
@@ -86,9 +102,9 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_show_no_tag
-    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
-    get image_path(@image.id)
+  def test_show__no_tag
+    image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
+    get image_path(image.id)
 
     assert_response :ok
     assert_select '#Header', 'This is the show page'
@@ -98,9 +114,9 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a', 'Homepage'
   end
 
-  def test_show_has_tags
-    @image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
-    get image_path(@image.id)
+  def test_show__has_tags
+    image = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    get image_path(image.id)
 
     assert_response :ok
     assert_select '#Header', 'This is the show page'
@@ -108,8 +124,8 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select '#no_tag_here', false
     assert_select 'li', 2
-    assert_select 'li.this_tag', 'fall'
-    assert_select 'li.this_tag', 'kid'
+    assert_select 'a[href=?]', '/images?tag=fall', text: 'fall'
+    assert_select 'a[href=?]', '/images?tag=kid', text: 'kid'
 
     assert_select 'a', 'Homepage'
   end
