@@ -8,7 +8,9 @@
 <ul>
   <% @images.each do |image| %>
       <li>
-        <img src="<%= image.link %>" width="400">
+        <%= link_to image_path(image) do %>
+          <img src="<%= image.link %>" width="400">
+        <% end %>
 
         <% if image.tag_list.empty? %>
             <br><strong class="no_tag_here"> (No tags for this image) </strong>
