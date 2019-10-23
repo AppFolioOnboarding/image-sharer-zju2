@@ -7,6 +7,7 @@ AllCops:
     - 'node_modules/**/*'
     - 'bin/*'
     - 'config/initializers/simple_form.rb'
+    - 'Gemfile'
   TargetRubyVersion: 2.5
 
 Layout/IndentFirstArrayElement:
@@ -19,7 +20,7 @@ Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
 Metrics/LineLength:
-  Max: 112  # Maximum line length from `rails new`
+  Max: 150  # Maximum line length from `rails new`
 
 Rails:
   Enabled: true
