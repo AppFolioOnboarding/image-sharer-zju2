@@ -5,9 +5,13 @@
     <h1>All Images</h1>
 <% end %>
 
-<ul>
+<% if flash[:notice] %>
+    <div class="notice"><%= flash[:notice] %></div>
+<% end %>
+
+<ul id="js-all-images">
   <% @images.each do |image| %>
-      <li>
+      <li class="js-one-image">
         <%= link_to image_path(image) do %>
           <img src="<%= image.link %>" width="400">
         <% end %>
@@ -18,7 +22,7 @@
             <ul>
               <% image.tag_list.each do |t| %>
                   <li class="this_tag">
-                    <%= link_to t, images_path(tag: t) %>
+                    <%= link_to t, images_path(tag: t), class: 'js-index-tag' %>
                   </li>
               <% end %>
             </ul>
