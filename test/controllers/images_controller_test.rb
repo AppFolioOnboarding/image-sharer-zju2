@@ -166,8 +166,8 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
       post images_path, params: { image: image_param }
     end
 
-    assert_response :unprocessable_entity
-    assert_select '.error', 'is an invalid URL'
+    assert_redirected_to new_image_path
+    assert_equal 'Link is an invalid URL', flash[:notice]
   end
 
   def test_destroy
@@ -191,6 +191,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :found
     assert_redirected_to images_path
+    assert_equal 'Image was successfully deleted', flash[:notice]
 
     get images_path
     assert_response :ok

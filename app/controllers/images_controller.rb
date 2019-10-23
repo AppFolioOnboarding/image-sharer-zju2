@@ -9,7 +9,7 @@ class ImagesController < ApplicationController
     if @image.save
       redirect_to @image, notice: 'Image was successfully created'
     else
-      render 'new', status: :unprocessable_entity
+      redirect_to new_image_path, notice: @image.errors.full_messages.join(',').to_s
     end
   end
 
@@ -32,7 +32,7 @@ class ImagesController < ApplicationController
     @image = Image.find_by(id: image_param)
     @image.destroy
 
-    redirect_to images_path
+    redirect_to images_path, notice: 'Image was successfully deleted'
   end
 
   private
