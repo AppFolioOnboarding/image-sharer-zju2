@@ -1,12 +1,23 @@
 module PageObjects
   module Images
     class NewPage < PageObjects::Document
-      path # TODO
+      path :new_image
+      path :image
 
-      form_for :image # TODO
+      element :flash_message, locator: '.notice'
+      element :new_page_locator, locator: '.js-new-page'
 
-      def create_image!(url: nil, tags: nil)
-        # TODO
+      form_for :image do
+        element :link, locator: '#image_link'
+        element :tag_list, locator: '#image_tag_list'
+      end
+
+      def create_image!(link: nil, tag_list: nil)
+        self.link.set(link) if link.present?
+        self.tag_list.set(tag_list) if tag_list.present?
+
+        node.click_on('save')
+        window.change_to(ShowPage, NewPage)
       end
     end
   end
