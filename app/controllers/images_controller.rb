@@ -9,12 +9,14 @@ class ImagesController < ApplicationController
     if @image.save
       redirect_to @image, notice: 'Image was successfully created'
     else
-      render 'new', status: :unprocessable_entity
+      redirect_to new_image_path, notice: @image.errors.full_messages.join(',').to_s
     end
   end
 
   def show
-    @image = Image.find(params[:id])
+    @image = Image.find_by(id: image_param)
+
+    redirect_to images_path unless @image.present?
   end
 
   def index
@@ -24,5 +26,18 @@ class ImagesController < ApplicationController
               else
                 Image.all.order(created_at: :desc)
               end
+  end
+
+  def destroy
+    @image = Image.find_by(id: image_param)
+    @image.destroy
+
+    redirect_to images_path, notice: 'Image was successfully deleted'
+  end
+
+  private
+
+  def image_param
+    params.require(:id)
   end
 end

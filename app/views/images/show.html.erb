@@ -1,4 +1,4 @@
-<h1 id="Header">This is the show page</h1>
+<h1 id="Header" class="js-show-page">This is the show page</h1>
 <p>
   <img src="<%= @image.link %>" width="400">
 </p>
@@ -8,12 +8,14 @@
 <% else %>
     <ul>
       <% @image.tag_list.each do |t| %>
-          <li>
-            <%= link_to t, images_path(tag: t) %>
-          </li>
+         <li id='js-image-tag'>
+           <%= link_to t, images_path(tag: t) %>
+         </li>
       <% end %>
     </ul>
 <% end %>
+
+<%= button_to 'Delete', image_path(@image), method: :delete, data: { confirm: 'Confirm to delete this image?' } %>
 
 <p>
   <%= link_to 'Homepage', root_path %>

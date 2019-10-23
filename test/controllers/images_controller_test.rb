@@ -28,7 +28,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_index__has_tags__not_filtering_by_tag
-    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    img = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
     get images_path
 
     assert_response :ok
@@ -36,6 +36,8 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a', text: 'Show all images', count: 0
     assert_select 'ul'
 
+    assert_select 'li a[href=?]', image_path(img)
+    assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
     assert_select 'li.this_tag:nth-child(1)', 'fall'
     assert_select 'li.this_tag:nth-child(2)', 'kid'
     assert_select 'li.this_tag:nth-child(1) a[href=?]', '/images?tag=fall', text: 'fall'
@@ -45,9 +47,11 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_index__no_tag
-    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
+    img = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg')
     get images_path
 
+    assert_select 'li a[href=?]', image_path(img)
+    assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
     assert_response :ok
     assert_select 'h1', 'All Images'
     assert_select 'ul'
@@ -59,7 +63,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_index__with_tag_filter
-    Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
+    img = Image.create!(link: 'https://i.imgur.com/8GaYYya.jpg', tag_list: 'fall, kid')
     Image.create!(link: 'https://i.imgur.com/8GaYYsadf.jpg', tag_list: 'kid')
     get images_path(tag: 'fall')
 
@@ -68,6 +72,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a[href=?]', images_path, text: 'Show all images'
     assert_select 'h1', text: 'All Images', count: 0
     assert_select 'img', count: 1
+    assert_select 'li a[href=?]', image_path(img)
     assert_select 'img[src=?]', 'https://i.imgur.com/8GaYYya.jpg'
 
     assert_select 'li' do
@@ -79,9 +84,9 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     url1 = 'https://i.imgur.com/eMroIPL.jpg'
     url2 = 'https://i.imgur.com/yKAX9Fm.jpg'
     url3 = 'https://i.imgur.com/IvVjToQ.jpg'
-    Image.create!(link: url1)
-    Image.create!(link: url2)
-    Image.create!(link: url3)
+    img1 = Image.create!(link: url1)
+    img2 = Image.create!(link: url2)
+    img3 = Image.create!(link: url3)
 
     get images_path
     assert_response :ok
@@ -90,14 +95,17 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     assert_select 'li'
 
     assert_select 'li:nth-child(1)' do
+      assert_select 'li a[href=?]', image_path(img3)
       assert_select format('img[src="%<url>s"]', url: url3)
     end
 
     assert_select 'li:nth-child(2)' do
+      assert_select 'li a[href=?]', image_path(img2)
       assert_select format('img[src="%<url>s"]', url: url2)
     end
 
     assert_select 'li:nth-child(3)' do
+      assert_select 'li a[href=?]', image_path(img1)
       assert_select format('img[src="%<url>s"]', url: url1)
     end
   end
@@ -158,7 +166,40 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
       post images_path, params: { image: image_param }
     end
 
-    assert_response :unprocessable_entity
-    assert_select '.error', 'is an invalid URL'
+    assert_redirected_to new_image_path
+    assert_equal 'Link is an invalid URL', flash[:notice]
+  end
+
+  def test_destroy
+    url1 = 'https://i.imgur.com/0NC5cyn.jpg'
+    url2 = 'https://i.imgur.com/8GaYYya.jpg'
+    url3 = 'https://i.imgur.com/TKvSSXh.jpg'
+    Image.create!(link: url1, tag_list: 'fall, dog')
+    @image = Image.create!(link: url2, tag_list: 'fall, kid')
+    Image.create!(link: url3, tag_list: 'fall, pumpkin')
+
+    get images_path
+    assert_response :ok
+
+    assert_select 'img' do |pic|
+      assert_equal url3, pic[0][:src]
+      assert_equal url2, pic[1][:src]
+      assert_equal url1, pic[2][:src]
+    end
+
+    delete image_path(@image.id)
+
+    assert_response :found
+    assert_redirected_to images_path
+    assert_equal 'Image was successfully deleted', flash[:notice]
+
+    get images_path
+    assert_response :ok
+
+    assert_select 'img'
+    assert_select 'img' do |pic|
+      assert_equal url3, pic[0][:src]
+      assert_equal url1, pic[1][:src]
+    end
   end
 end

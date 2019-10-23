@@ -1,4 +1,9 @@
+<div class="js-new-page"></div>
 <h1>Save new Image Here!</h1>
+
+<% if flash[:notice] %>
+    <div class="notice"><%= flash[:notice] %></div>
+<% end %>
 
 <%= simple_form_for @image do |form| %>
     <p>

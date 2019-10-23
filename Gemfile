@@ -33,6 +33,7 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'pronto-rubocop'
   gem 'spring'
+  gem 'pry'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
@@ -41,6 +42,7 @@ group :production do
 end
 
 group :test do
+  gem 'ae_page_objects'
   gem 'capybara'
   gem 'selenium-webdriver'
 end
