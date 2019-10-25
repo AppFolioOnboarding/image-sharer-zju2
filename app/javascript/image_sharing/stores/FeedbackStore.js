@@ -1,4 +1,4 @@
-export class FeedbackStore {
+class FeedbackStore {
   /* Implement your feedback store*/
 }
 
