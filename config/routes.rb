@@ -3,4 +3,9 @@ Rails.application.routes.draw do
   # root 'application#home'
   root 'images#index'
   resources :images, only: [:new, :create, :show, :index, :destroy]
+  resources :feedbacks, only: [:new]
+
+  namespace :api do
+    resource :feedbacks, only: [:create]
+  end
 end
