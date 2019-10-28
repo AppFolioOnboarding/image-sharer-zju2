@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { inject } from 'mobx-react';
 import Header from './Header';
+import Form from './Form';
 import Footer from './Footer';
 
 class App extends Component {
@@ -9,10 +9,11 @@ class App extends Component {
     return (
       <div>
         <Header title="Tell us what you think" />
+        <Form />
         <Footer content="Copyright: AppFolio Inc. Onboarding" />
       </div>
     );
   }
 }
 
-export default inject('stores')(App);
+export default (App);
